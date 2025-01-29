@@ -1,10 +1,29 @@
-import { useNavigate } from "react-router-dom"
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../redux/slices/authSlice";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCircleUser } from "@fortawesome/free-regular-svg-icons";
 
 function NavBar() {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { status, userData } = useSelector((state) => state.auth);
+
+    const handleLogOut = async () => {
+        await axios.post('/api/v1/users/logout')
+            .then((response) => {
+                console.log(response.data.message);
+                dispatch(logout());
+            }
+            ).catch((err) => {
+                console.error("Error during logout", err);
+            })
+    };
+
     return (
-        <div className="flex bg-[#0F0F0F]  p-4 items-center border-b border-white fixed w-full z-100">
-            <div className="flex-1 flex  items-center">
+        <div className="flex bg-[#0F0F0F] p-4 items-center border-b border-white fixed w-full z-100">
+            <div className="flex-1 flex items-center">
                 <h1 className="text-2xl font-bold text-white">Logo</h1>
             </div>
 
@@ -17,13 +36,39 @@ function NavBar() {
                 />
             </div>
 
-            <div className="flex-1 flex justify-center items-center space-x-4">
-                <button className="bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-800" onClick={() => navigate("/login")}>Login</button>
-                <button className="bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-800" onClick={() => navigate("/signUp")}>Sign Up</button>
+            <div className="flex-1 flex justify-center items-center">
+                {
+                    status ? (
+                        <div className="space-x-2">
+                            <FontAwesomeIcon icon={faCircleUser} size="xl" style={{ color: "#ffffff" }} />
+                            <span className=" text-white text-lg">{userData.username}</span>
+                            <button
+                                className="bg-purple-700 text-white py-2 px-4 ml-10 rounded hover:bg-purple-900"
+                                onClick={() => handleLogOut()}
+                            >
+                                Logout
+                            </button>
+                        </div>
+                    ) : (
+                        <>
+                            <button
+                                className="bg-purple-700 text-white py-2 px-4 rounded hover:bg-purple-900"
+                                onClick={() => navigate("/login")}
+                            >
+                                Login
+                            </button>
+                            <button
+                                className="bg-purple-700 text-white py-2 px-4 ml-10 rounded hover:bg-purple-900"
+                                onClick={() => navigate("/signUp")}
+                            >
+                                Sign Up
+                            </button>
+                        </>
+                    )
+                }
             </div>
         </div>
-
-    )
+    );
 }
 
-export default NavBar
+export default NavBar;

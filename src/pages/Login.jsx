@@ -1,21 +1,28 @@
+import axios from "axios";
 import { useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loginStart, loginSuccess, loginFailure } from "../redux/slices/authSlice";
 
 function Login() {
+
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
     const userNameRef = useRef();
     const passwordRef = useRef();
     const [error, setError] = useState("");
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        const userName = userNameRef.current.value;
+        const username = userNameRef.current.value;
         const password = passwordRef.current.value;
-    
+
         const fields = [
-            { value: userName, ref: userNameRef, name: 'Username' },
+            { value: username, ref: userNameRef, name: 'Username' },
             { value: password, ref: passwordRef, name: 'Password' },
         ];
-    
+
         // Check if any field is empty
         for (const field of fields) {
             if (!field.value) {
@@ -25,11 +32,21 @@ function Login() {
                 return;
             }
         }
-    
-        setError(""); 
-        console.log("Form Submitted",{userName, password});
+
+        setError("");
+        dispatch(loginStart())
+        await axios.post('/api/v1/users/login', { username, password },{ withCredentials: true })
+            .then((response) => {
+                console.log(response.data.message)
+                dispatch(loginSuccess(response.data.data.user))
+                navigate('/');
+            })
+            .catch((error) => {
+                console.error('Error:', error)
+                dispatch(loginFailure())
+            })
     };
-    
+
 
     return (
         <div className="flex bg-[#0F0F0F] justify-center items-center h-screen">

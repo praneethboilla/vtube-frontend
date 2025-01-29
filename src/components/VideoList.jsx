@@ -1,69 +1,65 @@
+import { useEffect } from "react"
 import Card from "../utils/Card"
+import axios from "axios"
+import { useState } from "react"
 
-const cardData = [
-  {
-    id: 1,
-    channelName: 'Card 1',
-    title: 'This is the description for card 1.',
-    userAvatar: "https://tse4.mm.bing.net/th?id=OIP.U0SfqHcCr4A3TEW4cIDGOQHaEI&pid=Api&P=0&h=180",
-    image: 'https://tse4.mm.bing.net/th?id=OIP.U0SfqHcCr4A3TEW4cIDGOQHaEI&pid=Api&P=0&h=180',
-    views: 4444,
-    uploadedDate: 444
-  },
-  {
-    id: 2,
-    channelName: 'Card 2',
-    title: 'This is the description for card 2.',
-    userAvatar: "https://tse4.mm.bing.net/th?id=OIP.U0SfqHcCr4A3TEW4cIDGOQHaEI&pid=Api&P=0&h=180",
-    image: 'https://tse4.mm.bing.net/th?id=OIP.U0SfqHcCr4A3TEW4cIDGOQHaEI&pid=Api&P=0&h=180',
-    views: 4444,
-    uploadedDate: 444
-  },
-  {
-    id: 3,
-    channelName: 'Card 3',
-    title: 'This is the description for card 3.',
-    userAvatar: "https://tse4.mm.bing.net/th?id=OIP.U0SfqHcCr4A3TEW4cIDGOQHaEI&pid=Api&P=0&h=180",
-    image: 'https://tse4.mm.bing.net/th?id=OIP.U0SfqHcCr4A3TEW4cIDGOQHaEI&pid=Api&P=0&h=180',
-    views: 4444,
-    uploadedDate: 444
-  },
-  {
-    id: 4,
-    channelName: 'Card 4',
-    title: 'This is the description for card 4  .',
-    userAvatar: "https://tse4.mm.bing.net/th?id=OIP.U0SfqHcCr4A3TEW4cIDGOQHaEI&pid=Api&P=0&h=180",
-    image: 'https://tse4.mm.bing.net/th?id=OIP.U0SfqHcCr4A3TEW4cIDGOQHaEI&pid=Api&P=0&h=180',
-    views: 4444,
-    uploadedDate: 444
-  },
-  {
-    id: 4,
-    channelName: 'Card 4',
-    title: 'This is the description for card 4  .',
-    userAvatar: "https://tse4.mm.bing.net/th?id=OIP.U0SfqHcCr4A3TEW4cIDGOQHaEI&pid=Api&P=0&h=180",
-    image: 'https://tse4.mm.bing.net/th?id=OIP.U0SfqHcCr4A3TEW4cIDGOQHaEI&pid=Api&P=0&h=180',
-    views: 4444,
-    uploadedDate: 444
-  },
-];
 
-function VideoList() {
+// eslint-disable-next-line react/prop-types
+function VideoList({ userId }) {
+
+  const [allVideos, setAllVideos] = useState([]);
+
+  useEffect(() => {
+    const fetchVideos = async ({ page = 1, limit = 10, query = '', sortBy = 'createdAt', sortType = 'desc', userId = '' }) => {
+      try {
+        // Construct the relative URL with query parameters
+        const url = new URL('/api/v1/videos', window.location.origin);
+
+        // Add parameters only if they are provided
+        if (userId) url.searchParams.set('userId', userId);
+        if (query) url.searchParams.set('query', query);
+        if (page) url.searchParams.set('page', page);
+        if (limit) url.searchParams.set('limit', limit);
+        if (sortBy && sortType) {
+          url.searchParams.set('sortBy', sortBy);
+          url.searchParams.set('sortType', sortType);
+        }
+
+        // Make the GET request using axios
+        const response = await axios.get(url.toString(),
+          // {
+          //   withCredentials: true,
+          // }
+        );
+
+        console.log('Videos fetched successfully');
+        setAllVideos(response.data.data);
+      } catch (error) {
+        console.error('Error fetching videos:', error);
+      }
+    };
+
+    fetchVideos({ userId });
+
+  }, [userId]);
 
   return (
-    <div className="flex flex-wrap gap-5 p-5 bg-[#0F0F0F] overflow-y-auto max-h-screen">
-      {
-        cardData.map((item) => (
-          <Card key={item.id}
+    <div className="flex flex-wrap gap-5 p-5 bg-[#0F0F0F] overflow-y-auto h-screen">
+      {allVideos.length > 0 ? (
+        allVideos.map((item) => (
+          <Card
+            key={item._id}
             title={item.title}
-            channelName={item.channelName}
-            image={item.image}
+            channelName={item.ownerDetails.username}
+            image={item.thumbnail}
             views={item.views}
-            uploadedDate={item.uploadedDate}
-            userAvatar={item.userAvatar}
+            uploadedDate={item.createdAt}
+            userAvatar={item.ownerDetails.avatar}
           />
         ))
-      }
+      ) : (
+        <p>No videos available</p>
+      )}
     </div>
   )
 }

@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faHeart, faClock, faListAlt, faSquareCaretRight } from "@fortawesome/free-regular-svg-icons";
 
 export default function SideBar() {
     return (
@@ -25,36 +27,28 @@ export default function SideBar() {
                 to="/liked"
                 className="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-purple-800 hover:text-gray-300"
             >
-                <svg className="w-6 h-6 stroke-current text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                </svg>
+                <FontAwesomeIcon icon={faHeart} size="lg" style={{color: "#ffffff"}}/>
                 <span className="ml-2 text-sm font-medium text-white">Liked</span>
             </Link>
             <Link
                 to="/subscription"
                 className="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-purple-800 hover:text-gray-300"
             >
-                <svg className="w-6 h-6 stroke-current text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                </svg>
+                 <FontAwesomeIcon icon={faSquareCaretRight} size="lg" style={{color: "#ffffff"}}/>
                 <span className="ml-2 text-sm font-medium text-white">Subscription</span>
             </Link>
             <Link
                 to="/history"
                 className="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-purple-800 hover:text-gray-300"
             >
-                <svg className="w-6 h-6 stroke-current text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                </svg>
+                <FontAwesomeIcon icon={faClock} size="lg" style={{color: "#ffffff"}}/>
                 <span className="ml-2 text-sm font-medium text-white">History</span>
             </Link>
             <Link
                 to="/playlist"
                 className="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-purple-800 hover:text-gray-300"
             >
-                <svg className="w-6 h-6 stroke-current text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                </svg>
+                <FontAwesomeIcon icon={faListAlt} size="lg" style={{color: "#ffffff"}}/>
                 <span className="ml-2 text-sm font-medium text-white">Playlist</span>
             </Link>
         </div>

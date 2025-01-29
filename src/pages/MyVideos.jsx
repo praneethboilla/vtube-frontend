@@ -1,31 +1,31 @@
-// import axios from 'axios'
-import VideoList from '../components/VideoList'
-
-// const url = "http://localhost:8000/api/v1/videos"
-
-// "http://localhost:8000/api/v1videos?page=1&limit=10&query=&sortBy=createdAt&sortType=desc&userId="
-
-// const params = {
-//   page:1,
-//   limit:10,
-//   query:'',
-//   sortBy:'createdAt',
-//   sortType: 'desc',
-//   userId:''
-// }
-
-// axios.get(url, {params})
-// .then(response => {
-//   console.log("data", response)
-// })
-// .catch(error => {
-//   console.error('Error:', error);  
-// });
+// import { useEffect } from 'react';
+import VideoList from '../components/VideoList';
+import { useSelector } from 'react-redux';
+// import { useNavigate } from 'react-router-dom';
+import Modal from '../components/modal';
 
 function MyVideos() {
+
+  // const navigate = useNavigate();
+
+  const { status, userData } = useSelector((state) => state.auth);
+  const userId = userData?._id;
+
+  // useEffect(() => {
+  //   if (!status) {
+  //     navigate('/login');
+  //   }
+  // }, [status, navigate])
+
   return (
-    <div className='ml-55 pt-18 justify-center'>
-      <VideoList/>
+    <div className="relative h-screen">
+      <div className='ml-55 pt-18 justify-center'>
+        {
+          status ? (<VideoList userId={userId} status={status} />)
+            :
+            (<Modal/>)
+        }
+      </div>
     </div>
   )
 }
