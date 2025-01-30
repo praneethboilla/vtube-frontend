@@ -2,8 +2,9 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/slices/authSlice";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleUser } from "@fortawesome/free-regular-svg-icons";
+import { faHippo } from "@fortawesome/free-solid-svg-icons";
 
 function NavBar() {
     const navigate = useNavigate();
@@ -11,7 +12,7 @@ function NavBar() {
     const { status, userData } = useSelector((state) => state.auth);
 
     const handleLogOut = async () => {
-        await axios.post('/api/v1/users/logout')
+        await axios.post('/api/v1/users/logout', { withCredentials: true })
             .then((response) => {
                 console.log(response.data.message);
                 dispatch(logout());
@@ -24,7 +25,8 @@ function NavBar() {
     return (
         <div className="flex bg-[#0F0F0F] p-4 items-center border-b border-white fixed w-full z-100">
             <div className="flex-1 flex items-center">
-                <h1 className="text-2xl font-bold text-white">Logo</h1>
+                <FontAwesomeIcon size="2xl" className="text-purple-700" icon={faHippo}/>
+                <h1 className="text-white text-2xl font-bold pl-2">V-tube</h1>
             </div>
 
             <div className="flex-1">

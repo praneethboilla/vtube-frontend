@@ -18,7 +18,7 @@ function MyVideos() {
   // }, [status, navigate])
 
   return (
-    <div className="relative h-screen">
+    <div className="relative h-screen overflow-y-scroll">
       <div className='ml-55 pt-18 justify-center'>
         {
           status ? (<VideoList userId={userId} status={status} />)

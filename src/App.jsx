@@ -5,6 +5,7 @@ import SideBar from './components/SideBar';
 import NavBar from './components/NavBar';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
+import Player from './pages/player';
 
 function App() {
     return (
@@ -29,6 +30,7 @@ function AppContext() {
                 {/* Protected Routes */}
                 <Route path="/" element={<Home />} />
                 <Route path="/my-videos" element={<MyVideos />} />
+                <Route path='/watch/:videoId' element={<Player/>} />
             </Routes>
         </>
     )

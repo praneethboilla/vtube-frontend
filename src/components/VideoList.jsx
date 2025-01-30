@@ -2,12 +2,16 @@ import { useEffect } from "react"
 import Card from "../utils/Card"
 import axios from "axios"
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import Modal from "./modal"
 
 
 // eslint-disable-next-line react/prop-types
-function VideoList({ userId }) {
+function VideoList({ userId, status }) {
 
+  const navigate = useNavigate();
   const [allVideos, setAllVideos] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchVideos = async ({ page = 1, limit = 10, query = '', sortBy = 'createdAt', sortType = 'desc', userId = '' }) => {
@@ -43,6 +47,15 @@ function VideoList({ userId }) {
 
   }, [userId]);
 
+
+  const handleSelectedVideo = (item) => {
+    if (status) {
+      navigate(`/watch/${item}`);
+    } else {
+      setIsModalOpen(true); // This opens the modal
+    }
+  };
+
   return (
     <div className="flex flex-wrap gap-5 p-5 bg-[#0F0F0F] overflow-y-auto h-screen">
       {allVideos.length > 0 ? (
@@ -55,11 +68,13 @@ function VideoList({ userId }) {
             views={item.views}
             uploadedDate={item.createdAt}
             userAvatar={item.ownerDetails.avatar}
+            onClick={() => handleSelectedVideo(item._id)}
           />
         ))
       ) : (
         <p>No videos available</p>
       )}
+      {isModalOpen && <Modal />}
     </div>
   )
 }
