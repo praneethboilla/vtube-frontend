@@ -5,7 +5,7 @@ import SideBar from './components/SideBar';
 import NavBar from './components/NavBar';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
-import Player from './pages/player';
+import Player from './pages/Player';
 import Liked from './pages/Liked';
 import Subscriptions from './pages/Subscriptions';
 import History from './pages/History';
