@@ -1,58 +1,72 @@
-import { useEffect } from "react"
-import Card from "../utils/Card"
-import axios from "axios"
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import Modal from "./modal"
-
+import { useEffect, useState } from "react";
+import Card from "../utils/Card";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import Modal from "./modal";
 
 // eslint-disable-next-line react/prop-types
 function VideoList({ userId, status }) {
-
   const navigate = useNavigate();
   const [allVideos, setAllVideos] = useState([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const fetchVideos = async (pageNumber) => {
+    if (loading || !hasMore) return;
+    setLoading(true);
+
+    try {
+      const url = new URL('/api/v1/videos', window.location.origin);
+      url.searchParams.set('page', pageNumber);
+      url.searchParams.set('limit', 10);
+      url.searchParams.set('sortBy', 'createdAt');
+      url.searchParams.set('sortType', 'desc');
+      if (userId) url.searchParams.set('userId', userId);
+
+      const response = await axios.get(url.toString());
+
+      if (response.data.data.length === 0) {
+        setHasMore(false);
+      } else {
+        setAllVideos((prev) => [...prev, ...response.data.data]);
+        setPage((prev) => prev + 1);
+      }
+    } catch (error) {
+      console.error("Error fetching videos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchVideos = async ({ page = 1, limit = 10, query = '', sortBy = 'createdAt', sortType = 'desc', userId = '' }) => {
-      try {
-        // Construct the relative URL with query parameters
-        const url = new URL('/api/v1/videos', window.location.origin);
+    setAllVideos([]); // Reset videos when userId changes
+    setPage(1);
+    setHasMore(true);
+    fetchVideos(1);
+  }, [userId]);
 
-        // Add parameters only if they are provided
-        if (userId) url.searchParams.set('userId', userId);
-        if (query) url.searchParams.set('query', query);
-        if (page) url.searchParams.set('page', page);
-        if (limit) url.searchParams.set('limit', limit);
-        if (sortBy && sortType) {
-          url.searchParams.set('sortBy', sortBy);
-          url.searchParams.set('sortType', sortType);
-        }
-
-        // Make the GET request using axios
-        const response = await axios.get(url.toString(),
-          // {
-          //   withCredentials: true,
-          // }
-        );
-
-        console.log('Videos fetched successfully');
-        setAllVideos(response.data.data);
-      } catch (error) {
-        console.error('Error fetching videos:', error);
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100 &&
+        hasMore &&
+        !loading
+      ) {
+        fetchVideos(page);
       }
     };
 
-    fetchVideos({ userId });
-
-  }, [userId]);
-
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [page, hasMore, loading]);
 
   const handleSelectedVideo = (item) => {
     if (status) {
       navigate(`/watch/${item}`);
     } else {
-      setIsModalOpen(true); // This opens the modal
+      setIsModalOpen(true);
     }
   };
 
@@ -74,9 +88,11 @@ function VideoList({ userId, status }) {
       ) : (
         <p>No videos available</p>
       )}
+
+      {loading && <p>Loading...</p>}
       {isModalOpen && <Modal />}
     </div>
-  )
+  );
 }
 
-export default VideoList
+export default VideoList;

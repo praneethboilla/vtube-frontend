@@ -3,8 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import SideVideoList from '../components/SideVideoList';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import { faThumbsUp, faThumbsDown  } from "@fortawesome/free-svg-icons";
-import { faThumbsUp, faThumbsDown, faShare } from "@fortawesome/free-solid-svg-icons";
+import { faThumbsUp, faShare } from "@fortawesome/free-solid-svg-icons";
 
 function Player() {
     const { videoId } = useParams();  // Get the videoId from the URL params
@@ -12,18 +11,34 @@ function Player() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [liked, setLiked] = useState(false);
-    const [disliked, setDisliked] = useState(false);
+    const [isSub, setIsSub] = useState(false);
 
-    const handleLike = () => {
-        if (disliked) setDisliked(false); // Dislike should be deselected if like is pressed
-        setLiked(!liked); // Toggle like button
+    const handleSub = async (subId) => {
+        try {
+            const response = await axios.post(`/api/v1/subscriptions/c/${subId}`,{},{withCredentials: true})
+            if(response.data.data.subscribed){
+                setIsSub(true)
+            } else {
+                setIsSub(false)
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleLikeDislike = async () => {
+        try {
+            const response = await axios.post(`/api/v1/likes/toggle/v/${videoId}`, {}, { withCredentials: true })
+            if (response.data.data.isLiked) {
+                setLiked(true);
+            } else {
+                setLiked(false);
+            }
+        } catch (error) {
+            console.error("Error toggling like/dislike:", error);
+        }
     };
-
-    const handleDislike = () => {
-        if (liked) setLiked(false); // Like should be deselected if dislike is pressed
-        setDisliked(!disliked); // Toggle dislike button
-    };
-
+    
     useEffect(() => {
         if (!videoId) {
             setError('No video ID provided');
@@ -35,8 +50,21 @@ function Player() {
             setLoading(true);
             try {
                 const response = await axios.get(`/api/v1/videos/${videoId}`, { withCredentials: true });
-                console.log("Video data:", response?.data?.data[0]);
-                setVideo(response.data?.data[0]);
+                const videoData = response.data?.data[0];
+                setVideo(videoData);
+                  // Check if user has liked the video
+                  if (videoData?.isLiked) {
+                    setLiked(true);
+                } else {
+                    setLiked(false);
+                }
+
+                if(videoData.owner.isSubscribed){
+                    setIsSub(true);
+                } else {
+                    setIsSub(false);
+                }
+
                 setLoading(false);  // Stop loading after data is fetched
             } catch (err) {
                 console.error('Error fetching video:', err);
@@ -74,12 +102,12 @@ function Player() {
                                     <h3 className='text-gray-500 text-sm'>{video.owner.subscribersCount} subscribers</h3>
                                 </div>
                                 {
-                                    video.owner.isSubscribed ? (
-                                        <button className='bg-[#272727] px-4 rounded-full h-9 self-center text-white'>
+                                    isSub ? (
+                                        <button onClick={() => handleSub(video.owner._id)} className='bg-[#272727] px-4 rounded-full h-9 self-center text-white'>
                                             Subscribed
                                         </button>
                                     ) : (
-                                        <button className='bg-purple-700 px-4 rounded-full hover:bg-purple-900 h-9 self-center'>
+                                        <button onClick={() => handleSub(video.owner._id)} className='bg-purple-700 px-4 rounded-full hover:bg-purple-900 h-9 self-center'>
                                             Subscribe
                                         </button>
                                     )
@@ -89,25 +117,15 @@ function Player() {
                                 <div className="flex space-x-8  bg-[#272727] px-4  h-9 rounded-full">
                                     {/* Like Button */}
                                     <button
-                                        onClick={handleLike}
+                                        onClick={handleLikeDislike}
                                         className={`transition duration-200 
                                     ${liked ? 'text-purple-700' : 'text-white hover:text-purple-500'}`}
                                     >
                                         <FontAwesomeIcon icon={faThumbsUp} className="text-2xl" />
                                     </button>
-
-                                    {/* Dislike Button */}
-                                    <button
-                                        onClick={handleDislike}
-                                        className={`transition duration-200 border-l-1 pl-3 border-black
-                                    ${disliked ? 'text-purple-700' : 'text-white hover:text-purple-500'}`}
-                                    >
-                                        <FontAwesomeIcon icon={faThumbsDown} className="text-2xl" />
-                                    </button>
                                 </div>
                                 <div className='ml-5'>
                                     <button
-                                        onClick={handleDislike}
                                         className={`transition duration-200 px-4 h-9 text-white hover:text-purple-500 bg-[#272727] rounded-full`}
                                     >
                                         <FontAwesomeIcon icon={faShare} className="text-2xl" />
